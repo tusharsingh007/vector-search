@@ -8,7 +8,7 @@ An interactive Streamlit application to benchmark and compare the performance (l
 
 #### Text-Based Search
 - Enter natural language descriptions like "red dress", "blue jeans", "ankle boots"
-- Uses Bedrock Titan to convert text to embeddings
+- Uses Amazon Titan to convert text to embeddings
 - Finds semantically similar fashion items
 #### Image-Based Search
 - Upload product images (PNG, JPG, JPEG)
