@@ -2,10 +2,8 @@ import streamlit as st
 import os
 from PIL import Image
 from dotenv import load_dotenv
-# Import all utility functions, including the new ES ones
 from utils import *
 
-# --- STYLING ---
 def load_css():
     st.markdown("""
         <style>
@@ -33,15 +31,12 @@ def load_css():
         </style>
     """, unsafe_allow_html=True)
 
-# --- CONFIGURATION ---
 load_dotenv()
 DATASET_IMAGES_LOCATION = os.environ.get("DATASET_IMAGES_LOCATION", "URL")
 S3_VECTOR_BUCKET_NAME = os.environ.get("S3_VECTOR_BUCKET_NAME", "your-s3-bucket")
 S3_VECTOR_INDEX_NAME = os.environ.get("S3_VECTOR_INDEX_NAME", "your-s3-index")
 ES_INDEX_NAME = os.environ.get("ES_INDEX_NAME", "fashion-products-index")
 
-
-# --- PAGE RENDERING FUNCTIONS ---
 def render_home_page():
     st.markdown("<div class='home-container'>", unsafe_allow_html=True)
     st.title("Welcome to the World of Vector Search ")
@@ -117,7 +112,6 @@ def render_elasticsearch_page():
         perform_search(search_method, query_prompt, uploaded_image, k, None, index_name, "Elasticsearch")
 
 
-# --- HELPER & LOGIC FUNCTIONS ---
 def display_search_results(results, query_time_ms, search_engine):
     if not results:
         st.warning("No results found. Try a different search query/image.")
@@ -180,7 +174,7 @@ def perform_search(method, query, image, k, bucket_name, index, engine):
             st.error(f"Error during search: {e}")
             st.info("Please check your AWS/Elasticsearch credentials and configuration.")
 
-# --- MAIN APP ROUTER ---
+
 def main():
     st.set_page_config(page_title="Search App", page_icon="", layout="wide")
     load_css()
