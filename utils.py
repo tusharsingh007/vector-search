@@ -12,12 +12,10 @@ import requests
 from dotenv import load_dotenv
 from elasticsearch import Elasticsearch
 
-# --- CONFIGURATION ---
 load_dotenv()
 session = boto3.session.Session()
 region = session.region_name
 
-# AWS Clients
 bedrock_client = boto3.client(
     "bedrock-runtime",
     region,
@@ -25,7 +23,6 @@ bedrock_client = boto3.client(
 )
 s3vectors = boto3.client("s3vectors", region_name=region)
 
-# --- NEW ELASTICSEARCH CLIENT CONFIGURATION ---
 ES_ENDPOINT = os.environ.get("ES_ENDPOINT")
 ES_API_KEY = os.environ.get("ES_API_KEY")
 
@@ -36,11 +33,7 @@ if ES_ENDPOINT and ES_API_KEY:
         api_key=ES_API_KEY
     )
 
-# Model ID
 multimodal_embed_model = 'amazon.titan-embed-image-v1'
-
-
-# --- EMBEDDING GENERATION (Unchanged) ---
 def get_titan_multimodal_embedding(
     image_path:str=None,
     description:str=None,
@@ -85,8 +78,6 @@ def get_titan_multimodal_embedding(
     )
     return json.loads(response.get("body").read())
 
-
-# --- S3 SEARCH FUNCTIONS (Unchanged) ---
 def search_similar_items_from_text(query_prompt, k, vector_bucket_name, index_name):
     query_emb = get_titan_multimodal_embedding(description=query_prompt, dimension=1024)["embedding"]
     start_time = time.time()
@@ -117,8 +108,6 @@ def search_similar_items_from_image(image_path, k, vector_bucket_name, index_nam
     query_time_ms = (end_time - start_time) * 1000
     return response["vectors"], query_time_ms
 
-
-# --- ELASTICSEARCH SEARCH FUNCTIONS ---
 def _search_es(query_emb, k, index_name):
     """Helper function to perform k-NN search in Elasticsearch."""
     if not es_client:
@@ -140,7 +129,6 @@ def _search_es(query_emb, k, index_name):
     end_time = time.time()
     query_time_ms = (end_time - start_time) * 1000
 
-    # Format the response to match the structure expected by the Streamlit UI
     results = []
     for hit in response['hits']['hits']:
         distance = 1.0 - hit['_score'] # Convert similarity score to distance
@@ -164,8 +152,6 @@ def search_similar_items_from_image_es(image_path, k, index_name):
     query_emb = get_titan_multimodal_embedding(image_path=image_path, dimension=1024)["embedding"]
     return _search_es(query_emb, k, index_name)
 
-
-# --- IMAGE UTILITY (Unchanged) ---
 def get_image_from_s3(image_full_path):
     if image_full_path.startswith('s3'):
         local_data_root = './data/images'
